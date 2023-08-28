@@ -4,7 +4,7 @@ const multer = require("multer")
 const path = require("path")
 const csvtojson = require("csvtojson")
 const csvfile = require("../model/csvmodel")
-
+const jsontocsv=require("json2csv").Parser
 
 const storage = multer.diskStorage({
     destination: 'src/upload',
@@ -47,6 +47,24 @@ route.get("/getcsv", async (req, res) => {
 
     const csvread = await csvfile.find()
     res.send({ user: csvread })
+
+})
+
+
+route.get("/exportcsv",async(req,res)=>{
+const usercsv=[]
+const userfile=await csvfile.find({})
+
+userfile.forEach((e)=>{
+  const {Name,Address,PhoneNumber,Salary}=e
+  usercsv.push({
+    Name,Address,PhoneNumber,Salary
+  })
+})
+const csvfiled=["Name","Address","PhoneNumber","Salary"]
+const csvparser=new jsontocsv({csvfiled})
+const csvdata=csvparser.parse(usercsv)
+res.send(csvdata)
 
 })
 
